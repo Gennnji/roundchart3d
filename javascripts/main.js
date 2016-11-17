@@ -49,13 +49,20 @@ $(document).ready(function() {
 
         var chartData = generateData();
 
-        $.each(chartData, function(cid){
-            var item = createLegendItem(this.name, this.color, 'circle');
-            if (parseInt(cid)){
-                $legend.prepend(item);
+        // сортируем по убыванию, чтобы вывести легенду
+        var legendData = chartData.slice(0).sort(function(a, b) {
+            if (a.end_sum > b.end_sum) {
+                return -1;
+            } else if (a.end_sum < b.end_sum) {
+                return 1;
             } else {
-                $legend.append(item);
+                return 0;
             }
+        });
+
+        $.each(legendData, function(index){
+            var item = createLegendItem(this.name, this.color, 'circle');
+            $legend.append(item);
         });
 
         initRoundChart3D({

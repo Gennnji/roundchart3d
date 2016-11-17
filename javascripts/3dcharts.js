@@ -210,65 +210,56 @@
                 return Math.round(1000*(d.endAngle-d.startAngle)/(Math.PI*2))/10+'%';
             }
 
+            function moveSectorTo(sector, translateX, translateY) {
+                this
+                    .transition()
+                        .attr('transform', 'translate(' + translateX + ', ' + translateY + ')');
+            }
+            // выделяет сектор
+            function focusSector() {
+                this
+                    .style('fill', function(d) {
+                        return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
+                    })
+                    .each(function(d) {
+                        // если сектор сейчас не меняет свою форму
+                        // if (!this.__transition__) {
+                            d3.select(this).call(
+                                moveSectorTo,
+                                20 * Math.cos(d.midAngle),
+                                20 * Math.sin(d.midAngle)
+                            );
+                        // }
+                    });
+            }
+            // возвращает сектор в исходное состояние
+            function blurSector() {
+                this
+                    .style('fill', function(d) {
+                        return d3.hsl(d3.select(this).style('fill')).darker(0.3);
+                    })
+                    .call(moveSectorTo, 0, 0);
+            }
+
             function mouseenterTooltip(d) {
 
                 var coordinateTooltip, heightTooltip, tooltip, widthTooltip, widthWindow,
                     $this = $(this),
                     $parent = $this.closest('.slices'),
-                    $list = $parent.children('.' + $this.attr('class')),
-                    index = $list.index($this);
+                    id = $this.data('id');
 
                 $parent.children(
-                    '.slice__top:eq(' + index + '),' +
-                    '.slice__bottom:eq(' + index + '),' +
-                    '.slice__inner:eq(' + index + '),' +
-                    '.slice__outer:eq(' + index + '),' +
-                    '.slice__side1:eq(' + index + '),' +
-                    '.slice__side2:eq(' + index + ')'
+                    '.slice__top[data-id="' + id + '"],' +
+                    '.slice__bottom[data-id="' + id + '"],' +
+                    '.slice__inner[data-id="' + id + '"],' +
+                    '.slice__outer[data-id="' + id + '"],' +
+                    '.slice__side1[data-id="' + id + '"],' +
+                    '.slice__side2[data-id="' + id + '"]'
                 )
-                    .css("cursor", "pointer");
-                    // .attr("opacity", 1);
-                    // .attr("opacity", 0.6);
-
-                var translateX = 20 * Math.cos(d.midAngle),
-                    translateY = 20 * Math.sin(d.midAngle);
-
-                d3.select(d3.selectAll('.slice__top')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(' + translateX + ', ' + translateY + ')');
-                d3.select(d3.selectAll('.slice__bottom')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(' + translateX + ', ' + translateY + ')');
-                d3.select(d3.selectAll('.slice__inner')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(' + translateX + ', ' + translateY + ')');
-                d3.select(d3.selectAll('.slice__outer')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(' + translateX + ', ' + translateY + ')');
-                d3.select(d3.selectAll('.slice__side1')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(' + translateX + ', ' + translateY + ')');
-                d3.select(d3.selectAll('.slice__side2')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(' + translateX + ', ' + translateY + ')');
+                    .css("cursor", "pointer")
+                    .each(function() {
+                        d3.select(this).call(focusSector);
+                    });
 
                 tooltip = d3.select(".chart .chart-tooltip_wrap");
                 tooltip.select(".chart .chart-tooltip_name").text(d.data.name);
@@ -280,61 +271,27 @@
                 tooltip.style("left", d3.event.pageX - $(".chart .chart-tooltip_wrap").outerWidth() / 2 + "px");
                 tooltip.style("top", d3.event.pageY - heightTooltip - 30 + "px").style("display", "block");
             };
-
             function mouseleaveTooltip(d) {
                 var $this = $(this),
                     $parent = $this.closest('.slices'),
-                    $list = $parent.children('.' + $this.attr('class')),
-                    index = $list.index($this);
-
-                d3.select(".chart .chart-tooltip_wrap").style("display", "none");
+                    id = $this.data('id');
 
                 $parent.children(
-                    '.slice__top:eq(' + index + '),' +
-                    '.slice__bottom:eq(' + index + '),' +
-                    '.slice__inner:eq(' + index + '),' +
-                    '.slice__outer:eq(' + index + '),' +
-                    '.slice__side1:eq(' + index + '),' +
-                    '.slice__side2:eq(' + index + ')'
-                ).attr("opacity", 1);
+                    '.slice__top[data-id="' + id + '"],' +
+                    '.slice__bottom[data-id="' + id + '"],' +
+                    '.slice__inner[data-id="' + id + '"],' +
+                    '.slice__outer[data-id="' + id + '"],' +
+                    '.slice__side1[data-id="' + id + '"],' +
+                    '.slice__side2[data-id="' + id + '"]'
+                )
+                    .attr("opacity", 1)
+                    .each(function() {
+                        d3.select(this).call(blurSector);
+                    });
 
-                d3.select(d3.selectAll('.slice__top')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).darker(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(0, 0)');
-                d3.select(d3.selectAll('.slice__bottom')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).darker(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(0, 0)');
-                d3.select(d3.selectAll('.slice__inner')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).darker(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(0, 0)');
-                d3.select(d3.selectAll('.slice__outer')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).darker(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(0, 0)');
-                d3.select(d3.selectAll('.slice__side1')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).darker(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(0, 0)');
-                d3.select(d3.selectAll('.slice__side2')[0][index])
-                    .style('fill', function(d) {
-                        return d3.hsl(d3.select(this).style('fill')).darker(0.3);
-                    })
-                    .transition()
-                        .attr('transform', 'translate(0, 0)');
+                d3.select(".chart .chart-tooltip_wrap").style("display", "none");
             };
+
 
             RoundChart3D.transition = function(id, data, init, rx, ry, depth, ir, outerHiddenAngles, innerPadding, padAngle){
                 function arcTweenInner(a) {
@@ -588,7 +545,8 @@
 
                 for (var selector in blocksConfig) {
                     blocks = slices.selectAll(selector).data(_currentData, idFunc);
-                    transition = blocks.transition()
+                    // TODO: namespace решил проблему, но непонятно почему
+                    transition = blocks.transition('change-shape')
                         .call(commonTransition);
 
                     for (var attrName in blocksConfig[selector]) {
@@ -613,6 +571,10 @@
                 function commonHandler() {
                     this
                         .attr('opacity', 0)
+                        // задаём id в data-параметре
+                        .attr('data-id', function(d) {
+                            return d.data.name;
+                        })
                         .each(function(d) {
                             this._current = d;
                         });
@@ -659,8 +621,7 @@
                         .style("stroke-width", 1)
                         .style("fill", function(d) { return d.data.color; })
                         .attr("d",function(d) { return pieBottom(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding);})
-                        .call(commonHandler)
-                        .call(mouseHandler);
+                        .call(commonHandler);
 
                 if (ir) {
                     // внутренние стороны (для кольцевой диаграммы)
