@@ -4,10 +4,9 @@
 
         var drawChart, responsiveChart;
 
-        !function() {
-            var RoundChart3D={};
-
-            var minLabelPadAngle = 0.4;
+        !function () {
+            var RoundChart3D = {},
+                minLabelPadAngle = 0.4;
 
             // возвращает уникальный ключ для элемента в наборе
             function idFunc(d) {
@@ -15,11 +14,15 @@
             }
 
             function mergeWithFirstEqualZero(first, second){
-                var secondSet = d3.set(); second.forEach(function(d) { secondSet.add(d.name); });
+                var secondSet = d3.set();
+
+                second.forEach(function (d) {
+                    secondSet.add(d.name);
+                });
 
                 var onlyFirst = first
-                    .filter(function(d){ return !secondSet.has(d.name) })
-                    .map(function(d) { d.value = 0; return d; });
+                    .filter(function (d){ return !secondSet.has(d.name) })
+                    .map(function (d) { d.value = 0; return d; });
                 return d3.merge([ second, onlyFirst ]);
             }
 
@@ -79,7 +82,9 @@
 
             function pieTop(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding) {
 
-                if (d.endAngle - d.startAngle == 0 ) return "M 0 0";
+                if (d.endAngle - d.startAngle == 0 ) {
+                    return "M 0 0";
+                }
 
                 var sector = getSectorParams(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding),
                     ret = [];
@@ -96,7 +101,9 @@
             }
             function pieBottom(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding) {
 
-                if (d.endAngle - d.startAngle == 0 ) return "M 0 0";
+                if (d.endAngle - d.startAngle == 0 ) {
+                    return "M 0 0";
+                }
 
                 var sector = getSectorParams(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding),
                     ret = [];
@@ -114,10 +121,12 @@
 
             function pieOuter(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding) {
 
-                if (d.endAngle - d.startAngle == 0 ) return "M 0 0";
+                if (d.endAngle - d.startAngle == 0 ) {
+                    return "M 0 0";
+                }
 
                 var startAngle = d.startAngle,
-                    endAngle = d.endAngle;
+                    endAngle = d.endAngle,
                     sector = getSectorParams(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding),
                     ret = [];
 
@@ -132,7 +141,9 @@
             // первая боковая сторона сектора
             function pieSide1(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding) {
 
-                if (d.endAngle - d.startAngle == 0 ) return [0, 0];
+                if (d.endAngle - d.startAngle == 0 ) {
+                    return [0, 0];
+                }
 
                 var sector = getSectorParams(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding),
                     ret = [
@@ -146,7 +157,9 @@
             // вторая боковая сторона сектора
             function pieSide2(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding) {
 
-                if (d.endAngle - d.startAngle == 0 ) return [0, 0];
+                if (d.endAngle - d.startAngle == 0 ) {
+                    return [0, 0];
+                }
 
                 var sector = getSectorParams(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding),
                     ret = [
@@ -161,7 +174,9 @@
             // внутренная сторона (пока не используется)
             function pieInner(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding){
 
-                if (d.endAngle - d.startAngle == 0 ) return "M 0 0";
+                if (d.endAngle - d.startAngle == 0 ) {
+                    return "M 0 0";
+                }
 
                 var startAngle = (d.startAngle < Math.PI ? Math.PI : d.startAngle),
                     endAngle = (d.endAngle < Math.PI ? Math.PI : d.endAngle);
@@ -218,10 +233,10 @@
             // выделяет сектор
             function focusSector() {
                 this
-                    .style('fill', function(d) {
+                    .style('fill', function (d) {
                         return d3.hsl(d3.select(this).style('fill')).brighter(0.3);
                     })
-                    .each(function(d) {
+                    .each(function (d) {
                         // если сектор сейчас не меняет свою форму
                         // if (!this.__transition__) {
                             d3.select(this).call(
@@ -235,7 +250,7 @@
             // возвращает сектор в исходное состояние
             function blurSector() {
                 this
-                    .style('fill', function(d) {
+                    .style('fill', function (d) {
                         return d3.hsl(d3.select(this).style('fill')).darker(0.3);
                     })
                     .call(moveSectorTo, 0, 0);
@@ -257,7 +272,7 @@
                     '.slice__side2[data-id="' + id + '"]'
                 )
                     .css("cursor", "pointer")
-                    .each(function() {
+                    .each(function () {
                         d3.select(this).call(focusSector);
                     });
 
@@ -285,7 +300,7 @@
                     '.slice__side2[data-id="' + id + '"]'
                 )
                     .attr("opacity", 1)
-                    .each(function() {
+                    .each(function () {
                         d3.select(this).call(blurSector);
                     });
 
@@ -293,36 +308,36 @@
             };
 
 
-            RoundChart3D.transition = function(id, data, init, rx, ry, depth, ir, outerHiddenAngles, innerPadding, padAngle){
+            RoundChart3D.transition = function (id, data, init, rx, ry, depth, ir, outerHiddenAngles, innerPadding, padAngle){
                 function arcTweenInner(a) {
                     var i = d3.interpolate(this._current, a);
                     this._current = i(0);
-                    return function(t) { return pieInner(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
+                    return function (t) { return pieInner(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
                 }
                 function arcTweenOuter(a) {
                     var i = d3.interpolate(this._current, a);
                     this._current = i(0);
-                    return function(t) { return pieOuter(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
+                    return function (t) { return pieOuter(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
                 }
                 function arcTweenTop(a) {
                     var i = d3.interpolate(this._current, a);
                     this._current = i(0);
-                    return function(t) { return pieTop(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
+                    return function (t) { return pieTop(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
                 }
                 function arcTweenBottom(a) {
                     var i = d3.interpolate(this._current, a);
                     this._current = i(0);
-                    return function(t) { return pieBottom(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
+                    return function (t) { return pieBottom(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
                 }
                 function arcTweenSide1(a) {
                     var i = d3.interpolate(this._current, a);
                     this._current = i(0);
-                    return function(t) { return pieSide1(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
+                    return function (t) { return pieSide1(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
                 }
                 function arcTweenSide2(a) {
                     var i = d3.interpolate(this._current, a);
                     this._current = i(0);
-                    return function(t) { return pieSide2(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
+                    return function (t) { return pieSide2(i(t), rx, ry, depth, ir, outerHiddenAngles, innerPadding);    };
                 }
 
                 function lineTweenPoints(a) {
@@ -330,7 +345,7 @@
                             irx = d3.interpolate(init ? 0 : rx, rx);
                             iry = d3.interpolate(init ? 0 : ry, ry);
                     this._current = i(0);
-                    return function(t) {
+                    return function (t) {
                         // получаем точки для линии и запоминаем их
                         var points = linePoints(i(t), irx(t), iry(t), depth, ir, innerPadding);
                         return points.join(',');
@@ -341,7 +356,7 @@
                             irx = d3.interpolate(init ? 0 : rx, rx);
                             iry = d3.interpolate(init ? 0 : ry, ry);
                     this._current = i(0);
-                    return function(t) {
+                    return function (t) {
                         // получаем точки для линии
                         var points = linePoints(i(t), irx(t), iry(t), depth, ir, innerPadding);
                         // и получаем конечную
@@ -354,7 +369,7 @@
                             irx = d3.interpolate(init ? 0 : rx, rx);
                             iry = d3.interpolate(init ? 0 : ry, ry);
                     this._current = i(0);
-                    return function(t) {
+                    return function (t) {
                         // получаем точки для линии
                         var points = linePoints(i(t), irx(t), iry(t), depth, ir, innerPadding);
                         // и получаем конечную
@@ -367,7 +382,7 @@
                             irx = d3.interpolate(init ? 0 : rx, rx);
                             iry = d3.interpolate(init ? 0 : ry, ry);
                     this._current = i(0);
-                    return function(t) {
+                    return function (t) {
                         // получаем точки для линии
                         var points = linePoints(i(t), irx(t), iry(t), depth, ir, innerPadding);
                         // и получаем конечную
@@ -393,7 +408,7 @@
                             irx = d3.interpolate(init ? 0 : rx, rx);
                             iry = d3.interpolate(init ? 0 : ry, ry);
                     this._current = i(0);
-                    return function(t) {
+                    return function (t) {
                         // получаем точки для линии
                         var points = linePoints(i(t), irx(t), iry(t), depth, ir, innerPadding);
                         // и получаем конечную
@@ -421,7 +436,7 @@
 
                 // для первого запуска анимируем все сектора последовательно
                 if (init) {
-                    transitionDelay = function(d, i) {
+                    transitionDelay = function (d, i) {
                         return i * 150;
                     };
                     transitionDuration = 160;
@@ -443,7 +458,7 @@
                 }
 
                 // получаем текущие данные в диаграмме
-                var currentData = slices.selectAll('.slice__bottom').data().map(function(d) { return d.data; });
+                var currentData = slices.selectAll('.slice__bottom').data().map(function (d) { return d.data; });
 
                 var _currentData = prepareData(mergeWithFirstEqualZero(currentData, data), false, padAngle),
                     _data = prepareData(data, false, padAngle);
@@ -533,10 +548,10 @@
                     },
                     'text': {
                         'funcType': "tween",
-                        'func': function(a) {
+                        'func': function (a) {
                             var i = d3.interpolate(this._current, a);
                             this._current = i(0);
-                            return function(t) {
+                            return function (t) {
                                 d3.select(this).text(getPercent(i(t)));
                             }
                         }
@@ -561,7 +576,7 @@
                 }
             }
 
-            RoundChart3D.draw=function(id, data, init, x/*center x*/, y/*center y*/,
+            RoundChart3D.draw = function (id, data, init, x/*center x*/, y/*center y*/,
                     rx/*radius x*/, ry/*radius y*/, depth, ir/*inner radius*/,
                     outerHiddenAngles/*углы в пределах которых внешние стороны не видны*/,
                     innerPadding/*inner padding*/,
@@ -572,10 +587,10 @@
                     this
                         .attr('opacity', 0)
                         // задаём id в data-параметре
-                        .attr('data-id', function(d) {
+                        .attr('data-id', function (d) {
                             return d.data.name;
                         })
-                        .each(function(d) {
+                        .each(function (d) {
                             this._current = d;
                         });
                 }
@@ -617,10 +632,10 @@
                 slicesBottom.enter()
                     .append("path")
                         .attr("class", "slice__bottom")
-                        .style("stroke", function(d) { return d.data.color; })
+                        .style("stroke", function (d) { return d.data.color; })
                         .style("stroke-width", 1)
-                        .style("fill", function(d) { return d.data.color; })
-                        .attr("d",function(d) { return pieBottom(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding);})
+                        .style("fill", function (d) { return d.data.color; })
+                        .attr("d",function (d) { return pieBottom(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding);})
                         .call(commonHandler);
 
                 if (ir) {
@@ -629,8 +644,8 @@
                     slicesInner.enter()
                         .append("path")
                             .attr("class", "slice__inner")
-                            .style("fill", function(d) { return d3.hsl(d.data.color).darker(0.7); })
-                            .attr("d",function(d) { return pieInner(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding);})
+                            .style("fill", function (d) { return d3.hsl(d.data.color).darker(0.7); })
+                            .attr("d",function (d) { return pieInner(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding);})
                             .call(commonHandler)
                             .call(mouseHandler);
                 }
@@ -640,8 +655,8 @@
                 slicesSide1.enter()
                     .append("polygon")
                         .attr("class", "slice__side1")
-                        .style("fill", function(d) { return d3.hsl(d.data.color).darker(0.7); })
-                        .attr("points", function(d) { return pieSide1(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding); })
+                        .style("fill", function (d) { return d3.hsl(d.data.color).darker(0.7); })
+                        .attr("points", function (d) { return pieSide1(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding); })
                         .call(commonHandler)
                         .call(mouseHandler);
 
@@ -650,8 +665,8 @@
                 slicesSide2.enter()
                     .append("polygon")
                         .attr("class", "slice__side2")
-                        .style("fill", function(d) { return d3.hsl(d.data.color).darker(0.7); })
-                        .attr("points", function(d) { return pieSide2(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding); })
+                        .style("fill", function (d) { return d3.hsl(d.data.color).darker(0.7); })
+                        .attr("points", function (d) { return pieSide2(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding); })
                         .call(commonHandler)
                         .call(mouseHandler);
 
@@ -660,8 +675,8 @@
                 slicesOuter.enter()
                     .append("path")
                         .attr("class", "slice__outer")
-                        .style("fill", function(d) { return d3.hsl(d.data.color).darker(0.7); })
-                        .attr("d", function(d) { return pieOuter(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding); })
+                        .style("fill", function (d) { return d3.hsl(d.data.color).darker(0.7); })
+                        .attr("d", function (d) { return pieOuter(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding); })
                         .call(commonHandler)
                         .call(mouseHandler);
 
@@ -670,10 +685,10 @@
                 slicesTop.enter()
                     .append("path")
                         .attr("class", "slice__top")
-                        .style("stroke", function(d) { return d.data.color; })
+                        .style("stroke", function (d) { return d.data.color; })
                         .style("stroke-width", 1)
-                        .style("fill", function(d) { return d.data.color; })
-                        .attr("d",function(d) { return pieTop(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding);})
+                        .style("fill", function (d) { return d.data.color; })
+                        .attr("d",function (d) { return pieTop(d, rx, ry, depth, ir, outerHiddenAngles, innerPadding);})
                         .call(commonHandler)
                         .call(mouseHandler);
 
@@ -685,7 +700,7 @@
                         .attr('fill', 'none')
                         .attr('stroke-width', 1)
                         .attr('stroke', 'lightgray')
-                        .attr("points", function(d) {
+                        .attr("points", function (d) {
                             // получаем точки для линии и запоминаем их
                             var points = linePoints(d, rx, ry, depth, ir, innerPadding, init);
                             return points.join(',');
@@ -697,8 +712,8 @@
                 linesCircle.enter()
                     .append("circle")
                         .attr("class", "line__circle")
-                        .attr("fill", function(d) { return d.data.color; })
-                        .each(function(d) {
+                        .attr("fill", function (d) { return d.data.color; })
+                        .each(function (d) {
                             // получаем точки для линии
                             var points = linePoints(d, rx, ry, depth, ir, innerPadding, init);
                             // и получаем конечную
@@ -718,7 +733,7 @@
                 linesPercent.enter()
                     .append("text")
                         .attr("class", "line__percent")
-                        .each(function(d) {
+                        .each(function (d) {
                             // получаем точки для линии
                             var points = linePoints(d, rx, ry, depth, ir, innerPadding, init);
                             // и получаем конечную
@@ -778,7 +793,7 @@
                 // генерируем данные для чарта
             var _data = d3.layout.pie()
                 .sort(null)
-                .value(function(d) {
+                .value(function (d) {
                     return d.value;
                 })
                 // проблемное место... пока начало диаграммы в нуле
@@ -793,7 +808,7 @@
                 minLabelPadAngle = padAngle * 2;
 
             // исправление недочёта D3: значение углов становится NaN, если значение из данных пустое
-            _data = _data.map(function(d) {
+            _data = _data.map(function (d) {
 
                 d.startAngle = isNaN( d.startAngle ) ? 0 : d.startAngle;
                 d.endAngle = isNaN( d.endAngle ) ? 0 : d.endAngle;
@@ -825,7 +840,7 @@
             return _data;
         }
 
-        drawChart = function(dataset) {
+        drawChart = function (dataset) {
             var width = 600,
                 height = 450,
                 // истинная толщина диаграммы (гипотенуза для вычисления радиуса по оси X)
@@ -853,7 +868,7 @@
                 init = false;
 
             // готовим данные для диаграммы и не исключаем пустые значения
-            data = dataset.dataObj.reduce(function(res, d) {
+            data = dataset.dataObj.reduce(function (res, d) {
                 res.push({
                     name: d.name,
                     value: d.value,
@@ -884,19 +899,19 @@
             RoundChart3D.transition("svg-chart", data, init, radiusX, radiusY, visibleDepth, 0, outerHidden, innerPadding, padAngle);
         }
 
-        responsiveChart = function() {
+        responsiveChart = function () {
             var aspect, chart, container;
             chart = $(".svg-chart");
             aspect = chart.width() / chart.height();
             container = $(".chart-canvas");
-            $(window).on("resize", function() {
+            $(window).on("resize", function () {
                 var targetWidth;
                 targetWidth = container.width();
                 chart.attr("width", targetWidth);
                 chart.attr("height", Math.round(targetWidth / aspect));
             }).trigger("resize");
         };
-        return window.initRoundChart3D = function(data) {
+        return window.initRoundChart3D = function (data) {
             drawChart(data);
             responsiveChart();
         };
